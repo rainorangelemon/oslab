@@ -10,19 +10,19 @@ QEMU    := qemu-system-i386
 GDB     := gdb
 
 CFLAGS := -Wall -Werror -Wfatal-errors #开启所有警告, 视警告为错误, 第一个错误结束编译
-CFLAGS += -MD #生成依赖文件
-CFLAGS += -std=gnu11 -m32 -c #编译标准, 目标架构, 只编译
-CFLAGS += -I . #头文件搜索目录
-CFLAGS += -O0 #不开优化, 方便调试
-CFLAGS += -fno-builtin #禁止内置函数
-CFLAGS += -ggdb3 #GDB调试信息
+CFLAGS += -MD 
+CFLAGS += -std=gnu11 -m32 -c 
+CFLAGS += -I .
+CFLAGS += -O0
+CFLAGS += -fno-builtin
+CFLAGS += -ggdb3
 
-QEMU_OPTIONS := -serial stdio #以标准输入输为串口(COM1)
-QEMU_OPTIONS += -d int #输出中断信息
-QEMU_OPTIONS += -monitor telnet:127.0.0.1:1111,server,nowait #telnet monitor
+QEMU_OPTIONS := -serial stdio
+QEMU_OPTIONS += -d int 
+QEMU_OPTIONS += -monitor telnet:127.0.0.1:1111,server,nowait
 
-QEMU_DEBUG_OPTIONS := -S #启动不执行
-QEMU_DEBUG_OPTIONS += -s #GDB调试服务器: 127.0.0.1:1234
+QEMU_DEBUG_OPTIONS := -S 
+QEMU_DEBUG_OPTIONS += -s
 
 GDB_OPTIONS := -ex "target remote 127.0.0.1:1234"
 GDB_OPTIONS += -ex "symbol $(KERNEL)"
@@ -51,9 +51,9 @@ KERNEL_O := $(KERNEL_C:%.c=$(OBJ_DIR)/%.o)
 KERNEL_O += $(KERNEL_S:%.S=$(OBJ_DIR)/%.o)
 
 $(IMAGE): $(BOOT) $(KERNEL)
-	    @$(DD) if=/dev/zero of=$(IMAGE) count=10000         > /dev/null # 准备磁盘文件
-	        @$(DD) if=$(BOOT) of=$(IMAGE) conv=notrunc          > /dev/null # 填充 boot loader
-		    @$(DD) if=$(KERNEL) of=$(IMAGE) seek=1 conv=notrunc > /dev/null # 填充 kernel, 跨过 mbr
+	    @$(DD) if=/dev/zero of=$(IMAGE) count=10000         > /dev/null
+	        @$(DD) if=$(BOOT) of=$(IMAGE) conv=notrunc          > /dev/null
+		    @$(DD) if=$(KERNEL) of=$(IMAGE) seek=1 conv=notrunc > /dev/null
 
 $(BOOT): $(BOOT_O)
 	    $(LD) -e start -Ttext=0x7C00 -m elf_i386 -nostdlib -o $@.out $^
@@ -89,7 +89,6 @@ DEPS := $(shell find -name "*.d")
 qemu: $(IMAGE)
 	    $(QEMU) $(QEMU_OPTIONS) $(IMAGE)
 
-# Faster, but not suitable for debugging
 qemu-kvm: $(IMAGE)
      $(QEMU) $(QEMU_OPTIONS) --enable-kvm $(IMAGE)
 
