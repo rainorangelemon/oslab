@@ -5,17 +5,17 @@ void bootmain(void){
 	struct ELFHeader *elf;
 	struct ProgramHeader *ph,*eph;
 	unsigned char *pa,*i;
-	elf(struct ELFHeader*)0x8000;
+	elf=(struct ELFHeader*)0x8000;
 	readseg((unsigned char*)elf,4096,0);
 	ph=(struct ProgramHeader*)((char*)elf+elf->phoff);
 	eph=ph+elf->phnum;
 	for(;ph<eph;ph++){
 		pa=(unsigned char*)ph->paddr;
-		readseg(pa,ph->filesz,ph->phoff);
+		readseg(pa,ph->filesz,ph->off);
 		for(i=pa+ph->filesz;i<pa+ph->memsz;*i++=0);
 	}
 	/*now we can get to the program*/
-	(void(*)(void))elf->entry();
+	((void(*)(void))elf->entry)();
 }
 
 void waitdisk(void){
